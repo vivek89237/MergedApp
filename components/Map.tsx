@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { StyleSheet, Text, View, Button } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import Mapbox, { MapView, Camera, LocationPuck } from '@rnmapbox/maps';
 import { Searchbar } from 'react-native-paper';
 import { featureCollection, point } from "@turf/helpers";
@@ -8,12 +8,14 @@ import { OnPressEvent } from '@rnmapbox/maps/lib/typescript/src/types/OnPressEve
 import { useScooter } from '../provider/ScooterProvider';
 import LineRoute from './LineRoute';
 import ShowVehicles from './ShowVehicles';
-import {getVehicleInfo} from "../utils/Firebase"
-import {getCoordinates} from "../services/directions";
+import { getVehicleInfo } from "../utils/Firebase";
+import { getCoordinates } from "../services/directions";
+import { useNavigation } from '@react-navigation/native'; // Import useNavigation
 
 Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_KEY || '');
 
 const Map = () => {
+  const navigation = useNavigation(); // Initialize navigation object
   const { setSelectedScooter, directionCoordinate } = useScooter();
   const [vendors, setVendor] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -41,18 +43,16 @@ const Map = () => {
     }
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     getVehicleInfo(setVendor);
-  },[])
+  }, []);
 
-  const address: string = "213B Dhiraj Nagar, Indore, Indore, Madhya Pradesh, India";
+  const address = "213B Dhiraj Nagar, Indore, Indore, Madhya Pradesh, India";
 
-  useEffect(()=>{
+  useEffect(() => {
     getCoordinates(address, setCoordinates);
-  },[])
-  
+  }, []);
 
-  // console.log('customer', customer);
   return (
     <View style={styles.container}>
       {/* Map View */}
@@ -60,12 +60,7 @@ const Map = () => {
         <Camera followZoomLevel={10} followUserLocation />
         <LocationPuck puckBearingEnabled puckBearing="heading" pulsing={{ isEnabled: true }} />
 
-        <ShowVehicles
-          onPointPress={onPointPress}
-          scootersFeatures={scootersFeatures}
-        />
-        
-
+        <ShowVehicles onPointPress={onPointPress} scootersFeatures={scootersFeatures} />
         {directionCoordinate && <LineRoute coordinates={directionCoordinate} />}
       </MapView>
 
@@ -77,8 +72,14 @@ const Map = () => {
           value={searchQuery}
           style={styles.searchbar}
         />
-        
       </View>
+
+      {/* Button to Navigate to VendorMap */}
+      <Button 
+        title="Go to Vendor Map" 
+        onPress={() => navigation.navigate('VendorMap')} // Navigate to VendorMap
+        style={styles.button} 
+      />
     </View>
   );
 };
@@ -92,7 +93,7 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     position: 'absolute',
-    top: 50, // Adjust this value as needed to move the search bar
+    top: 50,
     left: 10,
     right: 10,
   },
@@ -100,8 +101,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#A0D683',
     borderRadius: 10,
     paddingHorizontal: 10,
-    elevation: 5, // Adds shadow for Android
+    elevation: 5,
   },
+  button: {
+    marginTop: 20,
+    padding: 10,
+  }
 });
 
 export default Map;

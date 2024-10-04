@@ -1,16 +1,28 @@
-import { Stack, Link } from 'expo-router';
-import { StatusBar, StatusBarStyle } from 'react-native';
+// import React from 'react';
+// import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import Map from '~/components/Map';
-import SelectedScooterSheet from '~/components/SelectedScooterSheet';
-import MapboxGeocoding from '../components/Geo';
-import VendorMap from '../components/VendorMap';
-export default function Home() {
+import VendorMap from '~/components/VendorMap';
+import ScooterProvider from '~/provider/ScooterProvider';
+const Stack = createStackNavigator();
+
+export default function App() {
   return (
-    <>
-      <Stack.Screen options={{ title: 'Gocart', headerShown:false}} />
-      <Map />
-      {/* <VendorMap /> */}
-      <SelectedScooterSheet />
-    </>
+    <ScooterProvider>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen
+          name="Map"
+          component={Map}
+          options={{ headerShown: true }}
+        />
+        <Stack.Screen
+          name="VendorMap"
+          component={VendorMap}
+          options={{ title: 'Vendor Map' }}
+        />
+
+      </Stack.Navigator>
+    </ScooterProvider>
+
   );
 }
